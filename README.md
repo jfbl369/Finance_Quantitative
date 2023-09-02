@@ -10,7 +10,7 @@
 <h1> The purpose of my project is to study the DAX40 in a succession of "pyramidal" steps.</h1>
 <img align="right" width="300" height="300" src="AjOR.gif">
 
-First of all, a classic study of its characteristics, history and main metrics is required. </n>
+First of all, a classic study of its characteristics, history and main metrics is required. </b>
 Afterwards I base my analysis and my trading/investment strategies on the following postulates: 
 I analyze the market, its characteristics, history and key metrics. Then I carry out a macroeconomic analysis of its environment (GDP, unemployment, CPI, etc.). 
 Then, I analyze the national, European and wrold sentiment data to determine the bullish or bearish bias in line with my previous economic analysis. 
