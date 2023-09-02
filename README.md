@@ -1,6 +1,6 @@
 # Trading & Investment on German index "DAX40"
 
-## Goal
+## 🔸 To start
 
 - Analysis
 - Tools
