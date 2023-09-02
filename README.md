@@ -24,4 +24,4 @@
 
 | Data | Website |
 | ------ | ------ |
-| European commission | [https://economy-finance.ec.europa.eu/index_en][PlDb] |
+| European commission | [https://economy-finance.ec.europa.eu/index_en] |
