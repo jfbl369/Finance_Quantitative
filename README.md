@@ -16,3 +16,12 @@
 - Fear & Greed visualization 
 - Automatisation webscrapping & storage financial data
 - Prediction 
+
+
+## Sources
+
+## Fundamental
+
+| Data | Website |
+| ------ | ------ |
+| European commission | [https://economy-finance.ec.europa.eu/index_en][PlDb] |
