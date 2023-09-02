@@ -15,6 +15,8 @@ Then, I analyze the national, European and wrold sentiment data to determine the
 Once I've determined my bias, I look for an entry point via technical analysis and in line with the technical analysis, I set-up the entry with the best possible timing.
 Finally, once all my parameters have been calculated and mastered, I analyze the risk/reward to determine whether it's worth entering the market.
 
+[logo]: https://github.com/jfbl369/Trading_German_index_DAX/blob/main/AjOR.gif "Pyramidal steps"
+
 ## Summary
 
 - DAX analysis
