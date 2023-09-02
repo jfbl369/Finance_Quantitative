@@ -8,8 +8,8 @@
 
 ## 🔸 Introduction
 
-<h1> The purpose of my project is to study the DAX40 in a succession of "pyramidal" steps.</h1>
 <img align="right" width="300" height="300" src="AjOR.gif">
+The purpose of my project is to study the DAX40 in a succession of "pyramidal" steps.
 
 First of all, a classic study of its characteristics, history and main metrics is required.
 
