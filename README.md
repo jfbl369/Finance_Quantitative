@@ -1,4 +1,4 @@
-# Trading-Investment_tools
+# Trading & Investment on German index "DAX40"
 
 ## Summary
 
