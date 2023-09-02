@@ -6,6 +6,7 @@
 - Tools
 - ✨Algorithmes✨
 
+## 🔸 Introduction
 
 <h1> The purpose of my project is to study the DAX40 in a succession of "pyramidal" steps.</h1>
 <img align="right" width="300" height="300" src="AjOR.gif">
@@ -20,7 +21,7 @@ Once I've determined my bias, I look for an entry point via technical analysis a
 
 Finally, once all my parameters have been calculated and mastered, I analyze the risk/reward to determine whether it's worth entering the market.
 
-## Summary
+## 🔸 Summary
 
 - DAX analysis
 - News/Clock
