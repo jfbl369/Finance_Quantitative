@@ -1,3 +1,18 @@
 # Trading-Investment_tools
 
-Classic folder gathering/sharing
+## Summary
+
+
+- Analysis
+- Tools
+- ✨Algorithmes✨
+
+
+## Summary
+
+- DAX analysis
+- News/Clock
+- Retail sentimental
+- Fear & Greed visualization 
+- Automatisation webscrapping & storage financial data
+- Prediction 
