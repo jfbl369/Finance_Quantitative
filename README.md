@@ -14,7 +14,7 @@ I analyze the market, its characteristics, history and key metrics. Then I carry
 Then, I analyze the national, European and wrold sentiment data to determine the bullish or bearish bias in line with my previous economic analysis. 
 Once I've determined my bias, I look for an entry point via technical analysis and in line with the technical analysis, I set-up the entry with the best possible timing.
 Finally, once all my parameters have been calculated and mastered, I analyze the risk/reward to determine whether it's worth entering the market.
-
+<img align="right" width="100" height="100" src="AjOR.gif">
 ![](AjOR.gif)
 
 ## Summary
