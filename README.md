@@ -1,5 +1,5 @@
 # Trading & Investment on German index "DAX40"
-
+https://www.jfbl.me/Projects.html
 
 ## 🔸 To start
 
@@ -35,6 +35,7 @@ I analyze the market, its characteristics, history and key metrics. Then I carry
 - Sentiment retail visualization
 - [German economic tools webscrapping](https://github.com/jfbl369/Trading_German_index_DAX/blob/main/Macro_flow.pdf)
 - [Economic data saving on Google drive server](https://github.com/jfbl369/Trading_German_index_DAX/blob/main/API_drive5.PNG)
+- [Predictions](https://www.jfbl.me/Projects.html)
 
 
 ## 🔸 Sources
