@@ -1,20 +1,14 @@
 # Trading & Investment on German index "DAX40"
 
+
 ## 🔸 To start
 
 Repo to group some tools and analyses I've done in order to invest on the DAX40.
+Content:
 - Analysis
 - Tools
 - Algorithmes
-
-
-## 🔸 Contents
-
-- Exploration Data Analysis
-- Economic/News Alarm
-- Retail sentimental
-- Fear & Greed visualization 
-- Automatisation webscrapping & storage financial data
+- Exploration Data
 - Prediction
 
 
