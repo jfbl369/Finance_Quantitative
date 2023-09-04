@@ -8,7 +8,7 @@
 
 ## 🔸 Introduction
 
-<img align="right" width="300" height="300" src="Pym2.gif">
+<img align="right" width="450" height="300" src="Pym2.gif">
 The purpose of my project is to mastered the DAX40 throught several analysis and tools following a succession of "pyramidal" steps.
 
 First of all, a classic study of its characteristics, history and main metrics is required.
