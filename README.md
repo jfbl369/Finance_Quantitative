@@ -8,7 +8,7 @@
 
 ## 🔸 Introduction
 
-<img align="right" width="300" height="300" src="AjOR.gif">
+<img align="right" width="300" height="300" src="Pym2.gif">
 The purpose of my project is to mastered the DAX40 throught several analysis and tools following a succession of "pyramidal" steps.
 
 First of all, a classic study of its characteristics, history and main metrics is required.
@@ -20,7 +20,7 @@ Then, I analyze the national, European and wrold sentiment data to determine the
 Once I've determined my bias, I look for an entry point via technical analysis and in line with the technical analysis, I set-up the entry with the best possible timing.
 
 Finally, once all my parameters have been calculated and mastered, I analyze the risk/reward to determine whether it's worth entering the market.
-![Uploading Présentation sans titre.svg…]()
+
 
 ## 🔸 Summary
 
