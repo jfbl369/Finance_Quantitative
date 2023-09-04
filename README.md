@@ -34,6 +34,7 @@ I analyze the market, its characteristics, history and key metrics. Then I carry
 - [Fear & Greed Dax index](https://github.com/jfbl369/Trading_German_index_DAX/blob/main/DAX%26FG_V2.ipynb)
 - Sentiment retail visualization
 - [German economic tools webscrapping](https://github.com/jfbl369/Trading_German_index_DAX/blob/main/Macro_flow.pdf)
+- [Economic data saving on Google drive server](https://github.com/jfbl369/Trading_German_index_DAX/blob/main/API_drive5.PNG)
 
 
 ## 🔸 Sources
