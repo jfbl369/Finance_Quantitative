@@ -1,2 +1,2 @@
 # Papers
-https://www.ceremade.dauphine.fr/~carlier/progdyn.pdf
+[CEREMADE - Dauphine: Programmation Dynamique](https://www.ceremade.dauphine.fr/~carlier/progdyn.pdf)
