@@ -5,8 +5,8 @@
 
 # Commodities
 ## Reading
-NIVEAU 1 – Comprendre les bases des marchés du gaz et de l’électricité
-"Fundamentals of Natural Gas" – Vivek Chandra
+NIVEAU 1 – Comprendre les bases des marchés du gaz et de l’électricité \\
+"Fundamentals of Natural Gas" – Vivek Chandra \\
 "Electricity Markets: Pricing, Structures and Economics" – Chris Harris
 
 NIVEAU 2 – Apprendre les méthodes de trading et la structure des marchés dérivés énergie
