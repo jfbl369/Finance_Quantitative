@@ -5,19 +5,19 @@
 
 # Commodities
 ## Reading
-NIVEAU 1 – Comprendre les bases des marchés du gaz et de l’électricité \\
-"Fundamentals of Natural Gas" – Vivek Chandra \\
-"Electricity Markets: Pricing, Structures and Economics" – Chris Harris
+NIVEAU 1 – Comprendre les bases des marchés du gaz et de l’électricité
+- "Fundamentals of Natural Gas" – Vivek Chandra \\
+- "Electricity Markets: Pricing, Structures and Economics" – Chris Harris
 
 NIVEAU 2 – Apprendre les méthodes de trading et la structure des marchés dérivés énergie
-"Energy and Power Risk Management" – Alexander Eydeland & Krzysztof Wolyniec
-"Power System Economics" – Steven Stoft
-"Natural Gas Trading in North America" – David DeLucia
+- "Energy and Power Risk Management" – Alexander Eydeland & Krzysztof Wolyniec
+- "Power System Economics" – Steven Stoft
+- "Natural Gas Trading in North America" – David DeLucia
 
 NIVEAU 3 – Approche avancée : modélisation des prix et stratégies quantitatives
-"Commodity Option Pricing: A Practitioner's Guide" – Iain Clark
-"Modelling Energy Markets for Price Forecasting and Risk Management" – Derek W. Bunn
-"The Economics of Commodity Markets" – Julien Chevallier & Florian Ielpo
+- "Commodity Option Pricing: A Practitioner's Guide" – Iain Clark
+- "Modelling Energy Markets for Price Forecasting and Risk Management" – Derek W. Bunn
+- "The Economics of Commodity Markets" – Julien Chevallier & Florian Ielpo
 
 ## Projects
 Niveau 1 – Projets de base (0 à 1 mois)
