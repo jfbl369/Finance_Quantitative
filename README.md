@@ -6,6 +6,7 @@
 
 ## Niveau 3:
 - [CEREMADE - Dauphine: Programmation Dynamique](https://www.ceremade.dauphine.fr/~carlier/progdyn.pdf)
+- Nonlinear Option Pricing - Julien Guyon, Pierre Henry-Labordere
 
 
 
