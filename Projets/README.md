@@ -1,11 +1,4 @@
- # 🚀 Projets Python en Finance Quantitative
- 
- Bienvenue sur mon portfolio de projets Python appliqués à la finance quantitative.  
- Ces projets sont classés **du plus fondamental au plus avancé**, avec pour objectif de montrer une progression complète vers les compétences attendues en **trading quantitatif**, **modélisation stochastique**, **XVA**, et **pricing avancé**.
- 
- ---
- 
- ## 🔹 Niveau 1 — Fondations indispensables
+## 🔹 N1 - Fondations indispensables
  
  ### 1. Mouvement brownien et géométrique
  - Simulation de trajectoires de \( W_t \sim \mathcal{N}(0, t) \)
@@ -28,7 +21,7 @@
  
  ---
  
- ## 🔹 Niveau 2 — Techniques de pricing
+ ## 🔹 N2 - Techniques de pricing
  
  ### 5. Formule de Black-Scholes via Feynman-Kac
  - Simulation de l’espérance sous \( \mathbb{Q} \)
@@ -45,7 +38,7 @@
  
  ---
  
- ## 🔹 Niveau 3 — Produits dérivés complexes
+ ## 🔹 N3 — Produits dérivés complexes
  
  ### 8. Option barrière up-and-out (binomial)
  - Conditions de knockout implémentées dans l’arbre
@@ -62,7 +55,7 @@
  
  ---
  
- ## 🔹 Niveau 4 — Marchés incomplets & contrôle stochastique
+ ## 🔹 N4 — Marchés incomplets & contrôle stochastique
  
  ### 11. Modèle à volatilité stochastique (type Heston simplifié)
  - Simulation de deux processus corrélés
@@ -80,7 +73,7 @@
  
  ---
  
- ## 🔹 Niveau 5 — Projets premium desk quant / hedge fund
+ ## 🔹 N5 — Projets desk quant
  
  ### 14. Value-at-Risk (VaR)
  - Méthodes : Historique, Paramétrique (normale), Monte Carlo
