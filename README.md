@@ -1,5 +1,12 @@
-# Books
-- Problems and Solutions in Stochastic Calculus with Applications - Patrik Albin (Chalmers University of Technology, Sweden), Kais Hamza (Monash University, Australia), and Fima C Klebaner (Monash University, Australia)
+# Dimitri Bianco recommandations
+- Problems and Solutions in Stochastic Calculus with Applications by Patrik Albin (Chalmers University of Technology, Sweden), Kais Hamza (Monash University, Australia), and Fima C Klebaner (Monash University, Australia)
+- Statistics for Experimenters: Design, Innovation, and Discovery, 2nd Edition 2nd Edition by George E. P. Box (Author), J. Stuart Hunter (Author), William G. Hunter (Author)
+- Quantum Markets: Physical Theory of Market Microstructure by Jack Sarkissian (Author)
+- The StatQuest Illustrated Guide to Neural Networks and AI: With hands-on examples in PyTorch!!! Paperback – January 6, 2025 by Josh Starmer (Author)
+- Ergodic Theory: with a view towards Number Theory (Graduate Texts in Mathematics, Vol. 259) (Graduate Texts in Mathematics, 259) First Edition by Manfred Einsiedler (Author), Thomas Ward (Author)
+- Linear Models with R (Chapman & Hall/CRC Texts in Statistical Science) 3rd Edition by Julian J. Faraway (Author)
+- Exploring General Equilibrium by Fischer Black (Author)
+- Random Data: Analysis and Measurement Procedures 4th Edition by Julius S. Bendat (Author), Allan G. Piersol (Author)
 
 
 
