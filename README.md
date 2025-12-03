@@ -1,6 +1,5 @@
 # Finance de marché/Trading
-- [P&L explained](/Documents/P&L explained.pdf)
-
+- [P&L explained](</Documents/P&L explained.pdf>)
 
 
 # Sustainable Finance 
