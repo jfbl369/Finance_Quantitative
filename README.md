@@ -39,4 +39,6 @@
 - Nonlinear Option Pricing - Julien Guyon, Pierre Henry-Labordere
 - [Advanced Probability - Alexander Sokol & Anders Rønn-Nielsen](https://media.licdn.com/dms/document/media/v2/D4D1FAQGS4DFnCmZWaQ/feedshare-document-pdf-analyzed/B4DZYXLix0H4AY-/0/1744145684241?e=1745452800&v=beta&t=weTCeC2jQhBsoRznDtf6EL1_B6kLyahVz0w61aKDgeo)
 - [Handbook of Sustainable Finance - Thierry Roncalli](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4277875)
+- [Optimal Execution of Portfolio Transactions](</Documents/Optimal Execution of Portfolio Transactions.pdf>)
+
 
