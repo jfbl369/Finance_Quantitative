@@ -1,45 +1,52 @@
-# Mes notes
-## Fixed Income
--
--
+# 📘 Portfolio XVA – Projets Python
 
+Ce dépôt rassemble une série de projets Python liés au **Credit Valuation Adjustment (CVA)** et à la **gestion du risque de crédit sur dérivés**, développés dans le cadre de ma transition du back-office vers un poste de **Trader XVA**.
 
-# Finance de marché/Trading
-- [P&L explained](</Documents/P&L explained.pdf>)
-- [Formules d’approximation pour le pricing d'options](</Documents/Formules d’approximation pour le pricing d'options..pdf>)
+Les projets sont classés du plus simple au plus avancé pour refléter ma montée en compétences sur le sujet.
 
+---
 
+## 🟢 Niveau Débutant
 
-# References
+### 1. `expected-exposure-simulator`
+📊 Simulation de l’Expected Exposure (EE), Effective EE, EPE et PFE d’un produit dérivé (ex: IRS ou FX forward) à l’aide de Monte Carlo.
 
-## Jim Simons and related papers
-- [James H. Simons, PhD: Using Mathematics to Make Money](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4668072)
-- [Differential Characters for K-theory – Introduces a tool to study shapes and spaces using algebraic methods](https://www.researchgate.net/publication/267478341_Differential_Characters_for_K-theory)
-- [Structured Vector Bundles Define Differential K-Theory](https://www.researchgate.net/publication/2214213_Structured_Vector_Bundles_Define_Differential_K-Theory)
-- [The Mayer-Vietoris Property in Differential Cohomology](https://www.researchgate.net/publication/47535927_The_Mayer-Vietoris_Property_in_Differential_Cohomology)
-- [Axiomatic Characterization of Ordinary Differential Cohomology](https://www.researchgate.net/publication/2134483_Axiomatic_Characterization_of_Ordinary_Differential_Cohomology)
-- [The Atiyah Singer Index Theorem and Chern Weil Forms](https://www.researchgate.net/publication/266720568_The_Atiyah_Singer_Index_Theorem_and_Chern_Weil_Forms)
-- [Minimal Varieties in Riemannian Manifolds – Studies surfaces and shapes that minimize energy or area in curved spaces](https://www.math.stonybrook.edu/~bishop/classes/math638.F20/Simons_1968.pdf)
+### 2. `credit-spread-calculator`
+🧮 Calculateur de credit spread à partir des inputs fondamentaux : Probabilité de défaut (PD), taux de recouvrement (LGD) et maturité.
 
+### 3. `simple-cva-engine`
+📈 Moteur de calcul du CVA unilatéral basé sur la formule :  
+\( \text{CVA} = \sum \text{EE}_t \cdot \text{PD}_t \cdot \text{LGD} \cdot \text{DF}_t \)
 
-## Dimitri Bianco recommandations
-- Problems and Solutions in Stochastic Calculus with Applications
-- Statistics for Experimenters: Design, Innovation, and Discovery, 2nd Edition
-- Quantum Markets: Physical Theory of Market Microstructure by Jack Sarkissian
-- The StatQuest Illustrated Guide to Neural Networks and AI: With hands-on examples in PyTorch!
-- Ergodic Theory: with a view towards Number Theory (Graduate Texts in Mathematics, Vol. 259)
-- Linear Models with R (Chapman & Hall/CRC Texts in Statistical Science)
-- Exploring General Equilibrium by Fischer Black
-- Random Data: Analysis and Measurement Procedures
+---
 
+## 🟡 Niveau Intermédiaire
 
-# Papers, Books
-- [Calcul stochastique appliqué à la finance - Romuald ELIE & Idris KHARROUBI](https://media.licdn.com/dms/document/media/v2/D561FAQGkpnciH34wow/feedshare-document-pdf-analyzed/B56ZX8NrxWHQAc-/0/1743693225499?e=1745452800&v=beta&t=pkq1tyCMaQfOir1MxrlLLt2LVgJHJKBq2vyjaV9Mt54)
-- [CEREMADE - Dauphine: Programmation Dynamique](https://www.ceremade.dauphine.fr/~carlier/progdyn.pdf)
-- Nonlinear Option Pricing - Julien Guyon, Pierre Henry-Labordere
-- [Advanced Probability - Alexander Sokol & Anders Rønn-Nielsen](https://media.licdn.com/dms/document/media/v2/D4D1FAQGS4DFnCmZWaQ/feedshare-document-pdf-analyzed/B4DZYXLix0H4AY-/0/1744145684241?e=1745452800&v=beta&t=weTCeC2jQhBsoRznDtf6EL1_B6kLyahVz0w61aKDgeo)
-- [Handbook of Sustainable Finance - Thierry Roncalli](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4277875)
-- [Optimal Execution of Portfolio Transactions](</Documents/Optimal Execution of Portfolio Transactions.pdf>)
-- Theory of Financial Risk and Derivative Pricing: From Statistical Physics to Risk Management 2nd Edition (Jean-Philippe Bouchaud, Marc Potters)
+### 4. `cds-pd-bootstrapper`
+🔢 Bootstrap de courbe de probabilité de défaut à partir des prix CDS, en appliquant les principes d’équilibre des flux du contrat CDS.
 
+### 5. `bilateral-cva-evaluator`
+🔄 Implémentation du calcul bilatéral CVA – DVA, en tenant compte de la probabilité de défaut des deux contreparties.
+
+### 6. `wrong-way-risk-simulator`
+⚠️ Simulation d’un dérivé avec risque de Wrong-Way Risk (WWR), où l’exposition augmente quand la qualité de crédit se détériore.
+
+---
+
+## 🔴 Niveau Avancé
+
+### 7. `cva-hedging-simulator`
+🛡️ Simulation complète de la couverture dynamique de la CVA à l’aide de CDS + hedge du sous-jacent (delta-hedging), incluant les coûts de transaction.
+
+### 8. `cva-stress-tester`
+📉 Moteur de stress testing du CVA face à des chocs sur spreads, recouvrements et expositions (y compris sauts de marché).
+
+### 9. `cva-cds-feedback-loop`
+📊 Modélisation de la boucle de rétroaction entre CVA et prix CDS : l’achat de protection CDS impacte lui-même les spreads du marché.
+
+---
+
+## 🎯 Objectif final
+
+Ces projets ont pour but de démontrer ma compréhension technique et quantitative des problématiques XVA, avec un focus sur la **mesure du risque, le pricing, et la couverture dynamique**. Ils sont conçus pour soutenir ma candidature à un poste de **Trader XVA** ou au sein d’un **CVA Desk**.
 
