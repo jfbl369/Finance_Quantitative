@@ -1,5 +1,5 @@
 # Mes notes
-
+-------------------------------------------------------------------
 ## Finance de marché/Trading
 
 - [Duration Macaulay, Sensibilité & Convexité](</Documents/Duration Macaulay, Sensibilité, Convexité.pdf>)
@@ -13,7 +13,7 @@
 
 
 # References
-
+-------------------------------------------------------------------
 ## Jim Simons and related papers
 - [James H. Simons, PhD: Using Mathematics to Make Money](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4668072)
 - [Differential Characters for K-theory – Introduces a tool to study shapes and spaces using algebraic methods](https://www.researchgate.net/publication/267478341_Differential_Characters_for_K-theory)
@@ -36,6 +36,7 @@
 
 
 # Papers, Books
+-------------------------------------------------------------------
 - [Calcul stochastique appliqué à la finance - Romuald ELIE & Idris KHARROUBI](https://media.licdn.com/dms/document/media/v2/D561FAQGkpnciH34wow/feedshare-document-pdf-analyzed/B56ZX8NrxWHQAc-/0/1743693225499?e=1745452800&v=beta&t=pkq1tyCMaQfOir1MxrlLLt2LVgJHJKBq2vyjaV9Mt54)
 - [CEREMADE - Dauphine: Programmation Dynamique](https://www.ceremade.dauphine.fr/~carlier/progdyn.pdf)
 - Nonlinear Option Pricing - Julien Guyon, Pierre Henry-Labordere
