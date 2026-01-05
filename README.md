@@ -3,7 +3,7 @@
 ## Finance de marché/Trading
 
 - [Duration Macaulay, Sensibilité & Convexité](</Documents/Duration Macaulay, Sensibilité, Convexité.pdf>)
-- [Les Desks Vanilles & Flow](</Documents/LesDesksVanilles&Flow.pdf>)
+- [Les Desks Vanilles & Flows](</Documents/LesDesksVanilles&Flow.pdf>)
 - [Produits de Flux & Linéaires](</Documents/Produits de Flux & Linéaires.pdf>)
 - [Futures sur Taux courts](</Documents/Produits vanilles & leurs grecques - Futures sur Taux courts.pdf>)
 - [Interest Rates Swap (IRS)](</Documents/PProduits de Flux & Linéaires - IRS.pdf>)
