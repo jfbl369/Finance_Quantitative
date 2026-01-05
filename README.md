@@ -1,7 +1,13 @@
 # Mes notes
 
 ## Finance de marché/Trading
-- [P&L explained](</Documents/P&L explained.pdf>)
+
+- [Duration Macaulay, Sensibilité & Convexité](</Documents/Duration Macaulay, Sensibilité, Convexité.pdf>)
+- [Les Desks Vanilles & Flow](</Documents/LesDesksVanilles&Flow.pdf>)
+- [Produits de Flux & Linéaires](</Documents/Produits de Flux & Linéaires.pdf>)
+- [Futures sur Taux courts](</Documents/Produits vanilles & leurs grecques - Futures sur Taux courts.pdf>)
+- [Interest Rates Swap (IRS)](</Documents/PProduits de Flux & Linéaires - IRS.pdf>)
+- [PnL explained](</Documents/P&L explained.pdf>)
 - [Formules d’approximation pour le pricing d'options](</Documents/Formules d’approximation pour le pricing d'options.pdf>)
 
 
