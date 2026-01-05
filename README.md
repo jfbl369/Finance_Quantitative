@@ -6,7 +6,7 @@
 - [Les Desks Vanilles & Flows](</Documents/LesDesksVanilles&Flow.pdf>)
 - [Produits de Flux & Linéaires](</Documents/Produits de Flux & Linéaires.pdf>)
 - [Futures sur Taux courts](</Documents/Produits vanilles & leurs grecques - Futures sur Taux courts.pdf>)
-- [Interest Rates Swap (IRS)](</Documents/PProduits de Flux & Linéaires - IRS.pdf>)
+- [Interest Rates Swap (IRS)](</Documents/Produits de Flux & Linéaires - IRS.pdf>)
 - [PnL explained](</Documents/P&L explained.pdf>)
 - [Formules d’approximation pour le pricing d'options](</Documents/Formules d’approximation pour le pricing d'options.pdf>)
 
