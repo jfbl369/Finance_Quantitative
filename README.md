@@ -12,6 +12,9 @@
 
 
 
+
+
+
 # References
 -------------------------------------------------------------------
 ## Jim Simons and related papers
@@ -33,6 +36,11 @@
 - Linear Models with R (Chapman & Hall/CRC Texts in Statistical Science)
 - Exploring General Equilibrium by Fischer Black
 - Random Data: Analysis and Measurement Procedures
+
+
+
+
+
 
 
 # Papers, Books
