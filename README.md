@@ -7,11 +7,6 @@
 ## Application en ligne
 [Black-Shcoles Pricer](https://black-scholes-pricer-jqyeh8vkpjmkl8kcp5hdvn.streamlit.app/)
 
-## Corrections/Evolutions à faire
-- Mettre le Theta en daily
-- Mettre le Véga pour 1% de vol
-- Gérer les valeurs extrêmes (ex: 0)
-
 ## Description
 Application Streamlit pour calculer le prix d'une option européenne (call/put) avec le modèle de Black-Scholes et visualiser ses Greeks (Delta, Gamma, Vega, Theta, Rho).
 
@@ -25,6 +20,10 @@ Application Streamlit pour calculer le prix d'une option européenne (call/put) 
 ```bash
 pip install -r requirements.txt
 ```
+## Corrections/Evolutions à faire
+- Mettre le Theta en daily
+- Mettre le Véga pour 1% de vol
+- Gérer les valeurs extrêmes (ex: 0)
 
 ## Documents
 [Four Derivations of the Black Scholes PDE](https://frouah.com/finance%20notes/Black%20Scholes%20PDE.pdf)
