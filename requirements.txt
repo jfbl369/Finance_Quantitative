@@ -1,0 +1,11 @@
+numpy
+scipy
+pandas
+matplotlib
+ipython
+ipykernel
+ipywidgets
+jupyterlab_widgets
+widgetsnbextension
+sqlalchemy
+ipython-sql
