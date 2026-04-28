@@ -62,7 +62,7 @@ with st.sidebar:
     st.markdown("""
         <div style="margin-top: -1rem; margin-bottom: 1rem;">
             <a href="https://github.com/jfbl369/Black-Scholes-pricer" target="_blank" style="color:white; text-decoration:none; font-size:16px;">
-                🔗 GitHub
+                🔗 GitHub : jfbl369
             </a>
         </div>
     """, unsafe_allow_html=True)
