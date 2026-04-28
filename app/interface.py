@@ -8,7 +8,7 @@ from pricing import black_scholes_prix, black_scholes_greeks
 st.set_page_config(layout="wide")
 
 # =======================
-# 🎨 STYLE GÉNÉRAL
+# STYLE GÉNÉRAL
 # =======================
 st.markdown("""
     <style>
@@ -41,7 +41,7 @@ st.markdown("<h2 class='orange-code' style='text-align: left;'>Black-Scholes Pri
 
 
 # =======================
-# ⚙️ FONCTIONS GÉNÉRIQUES
+# FONCTIONS GÉNÉRIQUES
 # =======================
 def calc_d1_d2(S, K, T, r, sigma):
     d1 = (np.log(S / K) + (r + 0.5 * sigma**2) * T) / (sigma * np.sqrt(T))
@@ -56,7 +56,7 @@ def make_greek_plot(S_range, func, *args):
     return [func(s, *args) for s in S_range]
 
 # =======================
-# 🎛️ SIDEBAR
+# SIDEBAR
 # =======================
 with st.sidebar:
     st.markdown("""
@@ -90,7 +90,7 @@ col5.markdown(f"<div class='orange-code' style='text-align:center; font-size:16p
 col6.markdown(f"<div class='orange-code' style='text-align:center; font-size:16px;'>Rho<br><b>{rho:.2f}</b></div>", unsafe_allow_html=True)
 
 # =======================
-# 📈 COURBE S
+# COURBE S
 # =======================
 S_range = np.linspace(0.5 * K, 1.5 * K, 100)
 
@@ -112,7 +112,7 @@ def create_styled_plot(x, y, title, color, x_marker=None, y_marker=None):
     return fig
 
 # =======================
-# 📦 CALCUL DELTA
+# CALCUL DELTA
 # =======================
 d1, d2 = calc_d1_d2(S, K, T, r, sigma)
 delta = stats.norm.cdf(d1) if option_type == "call" else stats.norm.cdf(d1) - 1
@@ -124,7 +124,7 @@ def delta_func(s, K, T, r, sigma, opt_type):
 delta_curve = make_greek_plot(S_range, delta_func, K, T, r, sigma, option_type)
 
 # =======================
-# 📤 AFFICHAGE DELTA
+# AFFICHAGE DELTA
 # =======================
 st.markdown("<div class='greek-box'>", unsafe_allow_html=True)
 st.markdown("<div class='greek-title'>Delta</div>", unsafe_allow_html=True)
