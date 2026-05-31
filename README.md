@@ -1,8 +1,12 @@
 # Courses
 
 - [MIT - Topics in Mathematics with Applications in Finance](</https://ocw.mit.edu/courses/18-642-topics-in-mathematics-with-applications-in-finance-fall-2024/pages/syllabus/>)
+  Prerequisites:
+    - 18.03 Differential Equations (or approval of instructor),
+    - 18.05 Introduction to Probability and Statistics,
+    - 18.600 Probability and Random Variables,
+    - 18.06 Linear Algebra
 
--------------------------------------------------------------------
 # Notes
 
 ## Finance de marché/Trading
