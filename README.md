@@ -17,7 +17,7 @@
 
 
 
-## Jim Simons and related papers
+# Jim Simons and related papers
 - [James H. Simons, PhD: Using Mathematics to Make Money](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4668072)
 - [Differential Characters for K-theory – Introduces a tool to study shapes and spaces using algebraic methods](https://www.researchgate.net/publication/267478341_Differential_Characters_for_K-theory)
 - [Structured Vector Bundles Define Differential K-Theory](https://www.researchgate.net/publication/2214213_Structured_Vector_Bundles_Define_Differential_K-Theory)
@@ -27,7 +27,7 @@
 - [Minimal Varieties in Riemannian Manifolds – Studies surfaces and shapes that minimize energy or area in curved spaces](https://www.math.stonybrook.edu/~bishop/classes/math638.F20/Simons_1968.pdf)
 
 
-## Dimitri Bianco recommandations
+# Dimitri Bianco recommandations
 - Problems and Solutions in Stochastic Calculus with Applications
 - Statistics for Experimenters: Design, Innovation, and Discovery, 2nd Edition
 - Quantum Markets: Physical Theory of Market Microstructure by Jack Sarkissian
