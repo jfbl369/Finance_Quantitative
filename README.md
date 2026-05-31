@@ -1,5 +1,4 @@
 # Courses
-
 - [MIT - Topics in Mathematics with Applications in Finance](</https://ocw.mit.edu/courses/18-642-topics-in-mathematics-with-applications-in-finance-fall-2024/pages/syllabus/>)
   - Prerequisites:
     - 18.03 Differential Equations (or approval of instructor),
@@ -8,9 +7,6 @@
     - 18.06 Linear Algebra
 
 # Notes
-
-## Finance de marché/Trading
-
 - [Duration Macaulay, Sensibilité & Convexité](</Documents/Duration Macaulay, Sensibilité, Convexité.pdf>)
 - [Les Desks Vanilles & Flows](</Documents/LesDesksVanilles&Flow.pdf>)
 - [Produits de Flux & Linéaires](</Documents/Produits de Flux & Linéaires.pdf>)
@@ -20,11 +16,6 @@
 - [Formules d’approximation pour le pricing d'options](</Documents/Formules d’approximation pour le pricing d'options.pdf>)
 
 
-
-
-
--------------------------------------------------------------------
-# References
 
 ## Jim Simons and related papers
 - [James H. Simons, PhD: Using Mathematics to Make Money](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4668072)
@@ -47,13 +38,7 @@
 - Random Data: Analysis and Measurement Procedures
 
 
-
-
-
-
--------------------------------------------------------------------
-# Papers, Books
-
+# Miscellaneous
 - [Calcul stochastique appliqué à la finance - Romuald ELIE & Idris KHARROUBI](https://media.licdn.com/dms/document/media/v2/D561FAQGkpnciH34wow/feedshare-document-pdf-analyzed/B56ZX8NrxWHQAc-/0/1743693225499?e=1745452800&v=beta&t=pkq1tyCMaQfOir1MxrlLLt2LVgJHJKBq2vyjaV9Mt54)
 - [CEREMADE - Dauphine: Programmation Dynamique](https://www.ceremade.dauphine.fr/~carlier/progdyn.pdf)
 - Nonlinear Option Pricing - Julien Guyon, Pierre Henry-Labordere
