@@ -3,7 +3,7 @@
   - Prerequisites:
     - 18.03 Differential Equations (or approval of instructor),
     - 18.05 Introduction to Probability and Statistics,
-    - 18.600 Probability and Random Variables,
+    - [18.600 Probability and Random Variables](<https://ocw.mit.edu/courses/18-600-probability-and-random-variables-fall-2019/>),
     - 18.06 Linear Algebra
 
 # Notes
