@@ -5,6 +5,7 @@
     - [18.05 Introduction to Probability and Statistics](<https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2022/>),
     - [18.600 Probability and Random Variables](<https://ocw.mit.edu/courses/18-600-probability-and-random-variables-fall-2019/>),
     - [18.06 Linear Algebra](<https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/>)
+    - ([Probabilistic Systems Analysis and Applied Probability](<https://ocw.mit.edu/courses/6-041-probabilistic-systems-analysis-and-applied-probability-fall-2010/>))
 
 # Notes
 - [Duration Macaulay, Sensibilité & Convexité](</Documents/Duration Macaulay, Sensibilité, Convexité.pdf>)
