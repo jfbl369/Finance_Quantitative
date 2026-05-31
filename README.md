@@ -1,3 +1,8 @@
+# Courses
+-------------------------------------------------------------------
+- [MIT - Topics in Mathematics with Applications in Finance](</https://ocw.mit.edu/courses/18-642-topics-in-mathematics-with-applications-in-finance-fall-2024/pages/syllabus/>)
+
+
 # Notes
 -------------------------------------------------------------------
 ## Finance de marché/Trading
