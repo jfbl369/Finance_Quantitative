@@ -1,10 +1,10 @@
 # Courses
 - [MIT - Topics in Mathematics with Applications in Finance](</https://ocw.mit.edu/courses/18-642-topics-in-mathematics-with-applications-in-finance-fall-2024/pages/syllabus/>)
   - Prerequisites:
-    - 18.03 Differential Equations (or approval of instructor),
-    - 18.05 Introduction to Probability and Statistics,
+    - [18.03 Differential Equations (or approval of instructor)](<https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/>),
+    - [18.05 Introduction to Probability and Statistics](<https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2022/>),
     - [18.600 Probability and Random Variables](<https://ocw.mit.edu/courses/18-600-probability-and-random-variables-fall-2019/>),
-    - 18.06 Linear Algebra
+    - [18.06 Linear Algebra](<https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/>)
 
 # Notes
 - [Duration Macaulay, Sensibilité & Convexité](</Documents/Duration Macaulay, Sensibilité, Convexité.pdf>)
