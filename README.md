@@ -61,3 +61,55 @@
 
 
 
+
+### Commodities – Essentials
+
+#### Expert
+- Helyette Geman
+
+---
+
+### Reading
+
+#### Top 3
+- Chevallier & Ielpo — structure des marchés commodities (offre/demande, contango/backwardation)
+- Eydeland — trading énergie (power/gas, risques, Monte Carlo)
+- Cont & Tankov — modélisation avancée avec processus à sauts
+
+#### Par niveau
+- Niveau 1 : fondamentaux gaz et électricité  
+- Niveau 2 : trading et dérivés énergie  
+- Niveau 3 : pricing et modélisation quantitative  
+
+---
+
+### Projets
+
+#### Niveau 1
+- Construction d’une courbe forward  
+- Simulateur de PnL (spot, forward, option)
+
+#### Niveau 2
+- Stratégie de hedging avec forwards  
+- Analyse du spark spread (power vs gas)  
+- Corrélation météo et prix du gaz  
+
+#### Niveau 3
+- Backtest de stratégie de trading  
+- Modèle de prévision des prix  
+- Optimisation d’un stockage de gaz  
+
+---
+
+### Certifications
+- ICE – Energy Derivatives & Trading  
+- EEX – Power & Gas Markets  
+- IFP School – Energy Trading Fundamentals  
+
+---
+
+### Objectif
+
+- Comprendre la structure des marchés énergie  
+- Maîtriser les logiques de trading et de couverture  
+- Développer des projets quantitatifs appliqués
