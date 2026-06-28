@@ -11,7 +11,7 @@
 
 ## Roadmap 2
 - Calcul Stochastique
-- Méthodes Numériques
+- Méthodes Numér  iques
 - Contrôle Optimal
 - Stratégies quantitatives
 
