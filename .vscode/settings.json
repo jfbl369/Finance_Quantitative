@@ -1,9 +1,0 @@
-{
-    "python.defaultInterpreterPath": "/Users/jefflefebure/Documents/GitHub/.venv/bin/python",
-    "python.analysis.autoSearchPaths": true,
-    "python.analysis.typeCheckingMode": "basic",
-    "files.exclude": {
-        "**/.ipynb_checkpoints": true,
-        "**/.DS_Store": true
-    }
-}
