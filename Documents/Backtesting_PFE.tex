@@ -1,0 +1,519 @@
+\documentclass[11pt,a4paper]{article}
+
+% ------------------------------------------------------------------
+%  Encodage et langue
+% ------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[provide=*,french]{babel}
+\usepackage{csquotes}
+\usepackage{textcomp}
+\providecommand{\euro}{\texteuro}
+% Repli portable pour les guillemets si babel-french complet est absent
+% (sur Overleaf, \og et \fg de babel-french sont déjà définis et priment).
+\providecommand{\og}{«~}
+\providecommand{\fg}{~»}
+
+% ------------------------------------------------------------------
+%  Mathématiques
+% ------------------------------------------------------------------
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{bm}
+
+% ------------------------------------------------------------------
+%  Mise en page, tableaux, liens
+% ------------------------------------------------------------------
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[colorlinks=true,linkcolor=NavyBlue,citecolor=NavyBlue,urlcolor=NavyBlue]{hyperref}
+
+% ------------------------------------------------------------------
+%  Raccourcis
+% ------------------------------------------------------------------
+\newcommand{\PFE}{\mathrm{PFE}}
+\newcommand{\EE}{\mathrm{EE}}
+\newcommand{\EPE}{\mathrm{EPE}}
+\newcommand{\CE}{\mathrm{CE}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Qmeas}{\mathbb{Q}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Indic}{\mathbf{1}}
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\LRuc}{\mathrm{LR}_{uc}}
+\newcommand{\LRind}{\mathrm{LR}_{ind}}
+\newcommand{\LRcc}{\mathrm{LR}_{cc}}
+\newcommand{\LRB}{\mathrm{LR}_{B}}
+
+% Encadré "remarque importante"
+\newenvironment{remarque}
+  {\par\smallskip\noindent\begin{minipage}{\linewidth}\leftskip=1.2em
+   \footnotesize\itshape}
+  {\end{minipage}\par\smallskip}
+
+\theoremstyle{remark}
+\newtheorem*{remarknote}{Remarque}
+
+% ------------------------------------------------------------------
+%  Métadonnées
+% ------------------------------------------------------------------
+\title{\bfseries Backtesting empirique d'un moteur d'exposition :\\[2pt]
+un cadre de validation des quantiles de \emph{Potential Future Exposure}\\
+par tests de couverture (Kupiec, Christoffersen, Berkowitz)\\
+et application au modèle de Hull--White}
+
+\author{}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% ==================================================================
+\begin{abstract}
+\noindent
+Les moteurs d'exposition (\emph{exposure engines}) produisent, par simulation Monte-Carlo, les profils d'\emph{Expected Exposure} (EE) et de \emph{Potential Future Exposure} (PFE) qui alimentent la gestion du risque de contrepartie, le calcul du capital réglementaire (méthode des modèles internes, IMM) et la tarification du \emph{Credit Valuation Adjustment} (CVA). Si la littérature sur la \emph{construction} de ces modèles est abondante, la question --- pourtant centrale en validation de modèles --- de leur \textbf{vérification a posteriori} reste peu formalisée dans la littérature ouverte : comment démontrer empiriquement qu'un quantile prospectif d'exposition, tel que la PFE à $97{,}5\,\%$, est correctement calibré ? Cet article propose un cadre de backtesting des quantiles de PFE qui transpose, en les adaptant, les tests de couverture issus du backtesting de la \emph{Value-at-Risk} (VaR) : test de proportion d'échecs de Kupiec (couverture inconditionnelle), test d'indépendance et de couverture conditionnelle de Christoffersen, et test de densité de Berkowitz fondé sur la transformée probabiliste (\emph{Probability Integral Transform}, PIT). Nous explicitons trois difficultés spécifiques à l'exposition, généralement passées sous silence : (i) la distinction entre mesure historique $\Prob$ et mesure risque-neutre $\Qmeas$, qui détermine la légitimité même de l'exercice ; (ii) le problème des \textbf{fenêtres temporelles chevauchantes}, qui induit une autocorrélation mécanique des exceptions ; (iii) l'\textbf{atome en zéro} de la distribution d'exposition, qui invalide la transformée probabiliste au niveau de l'exposition et plaide pour un backtesting au niveau des facteurs de risque. Nous concevons ensuite une étude empirique sur un swap de taux vanille et sur un portefeuille (\emph{netting set}) exposé à la déformation de la courbe, en confrontant un moteur calibré sur le modèle de Hull--White à un fait des données présentant des écarts contrôlés. Nous montrons analytiquement et empiriquement les régimes où Hull--White \textbf{sous-estime} la PFE (horizons longs sous retour à la moyenne excessif, trades de courbe avec un seul facteur) et ceux où il la \textbf{sur-estime} (calibration risque-neutre transposée à un backtest historique).
+
+\medskip
+\noindent\textbf{Mots-clés :} risque de contrepartie, \emph{Potential Future Exposure}, backtesting, couverture des quantiles, test de Kupiec, test de Christoffersen, transformée probabiliste, modèle de Hull--White, validation de modèles.
+
+\noindent\textbf{Classification JEL :} C52, C58, G13, G32.
+\end{abstract}
+
+% ==================================================================
+\section{Introduction}
+
+Le risque de crédit de contrepartie (\emph{Counterparty Credit Risk}, CCR) désigne le risque qu'une contrepartie à un contrat dérivé fasse défaut avant l'échéance, alors que le contrat a une valeur positive pour nous. À la différence du risque de crédit classique (un prêt, où le montant exposé est connu), l'exposition à une contrepartie sur dérivés est \textbf{stochastique et bilatérale} : elle évolue avec les facteurs de marché et peut basculer d'un côté à l'autre du bilan. La quantifier exige donc de \emph{projeter dans le futur} la distribution de la valeur de marché des contrats, puis d'en extraire des statistiques : l'exposition espérée (EE), pour la tarification et le CVA, et un quantile élevé, la PFE, pour le pilotage des limites et le capital.
+
+Ces grandeurs sont produites par des \textbf{moteurs d'exposition} : des systèmes de simulation Monte-Carlo qui (i) diffusent les facteurs de risque sur une grille temporelle, (ii) revalorisent chaque transaction sur chaque scénario et à chaque date, (iii) agrègent par \emph{netting set} puis calculent EE et PFE. La fiabilité de l'ensemble du dispositif de gestion du CCR --- limites, capital IMM, marges initiales, CVA --- repose sur l'hypothèse que ces distributions projetées sont \textbf{bien calibrées}.
+
+Or la validation de cette hypothèse est étonnamment peu traitée dans la littérature académique ouverte, alors qu'elle constitue une exigence réglementaire explicite pour les banques en méthode des modèles internes et une demande récurrente des équipes de validation. La raison tient à une difficulté conceptuelle : contrairement à la VaR, qui est un quantile à un jour réémis quotidiennement et donc abondamment testable, la PFE est un \textbf{quantile prospectif à horizon long} d'une grandeur dont on n'observe, pour un trade donné, qu'une seule trajectoire réalisée. Le backtesting de la PFE n'est donc pas un simple décompte d'exceptions journalières : il exige un protocole soigneux.
+
+\paragraph{Contributions.} Cet article (i) expose de façon auto-contenue, accessible au débutant, l'ensemble de la chaîne conceptuelle --- du risque de contrepartie aux quantiles de PFE ; (ii) formalise un cadre de backtesting des quantiles de PFE par adaptation des tests de Kupiec, Christoffersen et Berkowitz ; (iii) met en évidence et traite trois écueils spécifiques (mesure $\Prob$/$\Qmeas$, fenêtres chevauchantes, atome en zéro) ; (iv) conçoit une étude empirique sur un swap et un portefeuille, et caractérise analytiquement les régimes de sous- et sur-estimation de la PFE par le modèle de Hull--White. Le papier est volontairement structuré pour qu'une implémentation Python en découle directement.
+
+\paragraph{Plan.} La section~\ref{sec:prelim} pose tous les préliminaires sur le risque de contrepartie et les mesures d'exposition. La section~\ref{sec:moteur} décrit le moteur d'exposition et le modèle de Hull--White. La section~\ref{sec:probleme} énonce précisément le problème de validation. La section~\ref{sec:cadre} développe le cadre de backtesting. La section~\ref{sec:empirique} conçoit l'étude empirique. La section~\ref{sec:resultats} discute les résultats attendus, la section~\ref{sec:limites} les limites, la section~\ref{sec:conclusion} conclut.
+
+% ==================================================================
+\section{Préliminaires : risque de contrepartie et mesures d'exposition}
+\label{sec:prelim}
+
+\begin{remarque}
+Cette section part de zéro. Le lecteur familier de la matière peut passer directement à la section~\ref{sec:mesures}, qui contient la distinction $\Prob$/$\Qmeas$, déterminante pour la suite.
+\end{remarque}
+
+\subsection{Le risque de crédit de contrepartie}
+
+Considérons deux parties qui concluent un contrat dérivé, par exemple un swap de taux. À toute date future $t$, le contrat possède une \textbf{valeur de marché} (\emph{mark-to-market}) $V(t)$, qui peut être positive ou négative selon l'évolution des taux. Si notre contrepartie fait défaut à l'instant $t$ :
+\begin{itemize}[nosep]
+  \item si $V(t) > 0$ (le contrat nous est favorable), nous subissons une perte : nous sommes créancier d'un montant $V(t)$ que la contrepartie défaillante ne réglera, au mieux, que partiellement ;
+  \item si $V(t) \le 0$ (le contrat nous est défavorable), nous restons tenu de nos engagements ; il n'y a pas de gain consécutif au défaut.
+\end{itemize}
+L'exposition n'est donc due qu'au \textbf{côté positif} de la valeur.
+
+\subsection{La notion d'exposition}
+
+On définit l'\textbf{exposition} à la date $t$, pour une transaction isolée, par
+\begin{equation}
+E(t) = \max\big(V(t),\, 0\big) = V(t)^{+}.
+\end{equation}
+C'est le montant que nous perdrions en cas de défaut instantané de la contrepartie à $t$ (avant tout recouvrement). L'exposition est par construction \textbf{positive ou nulle} et fonction de l'aléa de marché à travers $V(t)$.
+
+\subsection{\emph{Netting} et collatéral}
+
+Deux mécanismes contractuels modifient l'exposition.
+
+\paragraph{Netting (compensation).} Sous un accord-cadre de compensation (ISDA Master Agreement), en cas de défaut, l'ensemble des transactions du même \emph{netting set} est compensé en une seule créance nette. L'exposition se calcule alors au niveau de l'ensemble :
+\begin{equation}
+E(t) = \Big(\sum_{i=1}^{n} V_i(t)\Big)^{+},
+\end{equation}
+et non $\sum_i V_i(t)^{+}$. Comme $\big(\sum_i V_i\big)^{+} \le \sum_i V_i^{+}$, le netting \textbf{réduit} l'exposition : les valeurs négatives de certains contrats compensent les valeurs positives d'autres. Ce point est essentiel pour notre cas portefeuille (section~\ref{sec:portefeuille}).
+
+\paragraph{Collatéral (marges de variation).} Sous une annexe de soutien au crédit (CSA), les parties échangent quotidiennement du collatéral qui couvre la valeur du \emph{netting set}. L'exposition résiduelle s'écrit
+\begin{equation}
+E(t) = \big(V(t) - C(t)\big)^{+},
+\end{equation}
+où $C(t)$ est le collatéral détenu. Le collatéral n'élimine pas l'exposition à cause du \textbf{délai de marge} (\emph{Margin Period of Risk}) : entre le dernier appel de marge honoré et la liquidation, le marché continue de bouger. Nous traiterons d'abord le cas non collatéralisé (le plus pédagogique pour le backtesting), puis indiquerons l'extension.
+
+\subsection{Profils d'exposition : CE, EE, EPE, PFE}
+
+L'exposition $E(t)$ étant une variable aléatoire pour chaque horizon $t$, on en résume la distribution par des \textbf{profils} --- des fonctions de $t$.
+\begin{itemize}[nosep]
+  \item \textbf{Exposition courante} (\emph{Current Exposure}) : $\CE = E(0) = V(0)^{+}$, connue aujourd'hui.
+  \item \textbf{Exposition espérée} (\emph{Expected Exposure}) :
+  \begin{equation}
+  \EE(t) = \E\big[E(t)\big] = \E\big[V(t)^{+}\big].
+  \end{equation}
+  C'est la moyenne de l'exposition à l'horizon $t$. Elle alimente directement le CVA.
+  \item \textbf{Exposition positive espérée} (\emph{Expected Positive Exposure}) : moyenne temporelle de l'EE sur l'horizon $[0,T]$,
+  \begin{equation}
+  \EPE = \frac{1}{T}\int_0^T \EE(t)\,\dd t.
+  \end{equation}
+  La variante réglementaire \textbf{EEPE} (\emph{Effective EPE}) utilise un profil EE rendu non décroissant.
+  \item \textbf{Exposition future potentielle} (\emph{Potential Future Exposure}) : le quantile de niveau $\alpha$ de l'exposition à l'horizon $t$,
+  \begin{equation}
+  \boxed{\;\PFE_\alpha(t) = \inf\big\{x \in \R : \Prob\big(E(t) \le x\big) \ge \alpha \big\} = Q_{E(t)}(\alpha)\;}
+  \end{equation}
+  avec typiquement $\alpha \in \{0{,}95;\,0{,}975;\,0{,}99\}$. La PFE est une mesure \og pire cas \fg{} servant à fixer les limites de contrepartie. On note souvent \textbf{Max-PFE} $= \max_{t\le T}\PFE_\alpha(t)$.
+\end{itemize}
+
+La figure conceptuelle est la suivante : pour un swap, l'EE et la PFE forment des \og cloches \fg{} croissantes puis décroissantes ; elles croissent au début (la diffusion des taux écarte les valeurs) et décroissent vers l'échéance (l'amortissement réduit le nombre de flux restants). \textbf{La PFE est l'objet central de cet article.}
+
+\subsection{Mesure historique $\Prob$ versus mesure risque-neutre $\Qmeas$ : le point décisif}
+\label{sec:mesures}
+
+Les espérances et quantiles ci-dessus sont calculés sous une \textbf{mesure de probabilité}, et le choix de cette mesure n'est pas neutre.
+\begin{itemize}[nosep]
+  \item Sous la \textbf{mesure risque-neutre $\Qmeas$}, les facteurs de risque dérivent au taux sans risque ; c'est la mesure de la \emph{tarification}. Le CVA, qui est un prix, se calcule sous $\Qmeas$, et les paramètres (volatilités) sont calibrés sur les instruments de marché (swaptions, caps/floors).
+  \item Sous la \textbf{mesure historique (\og réelle \fg{}) $\Prob$}, les facteurs dérivent selon leur tendance observée ; c'est la mesure de ce qui \emph{se réalise effectivement} dans le monde.
+\end{itemize}
+Le backtesting confronte les prédictions du modèle à des \textbf{réalisations de marché observées}. Il porte donc, par nature, sur la mesure $\Prob$ : on ne peut comparer une distribution simulée à l'histoire réalisée que si cette distribution est la distribution \textbf{historique}.
+
+\begin{remarque}
+\textbf{Conséquence pratique majeure.} Un même moteur d'exposition peut être calibré $\Qmeas$ pour le CVA et $\Prob$ pour le pilotage du risque / le capital IMM. Backtester un profil de PFE calibré sous $\Qmeas$ contre l'histoire réalisée est \textbf{méthodologiquement incorrect} et conduira mécaniquement à des rejets. Comme la volatilité implicite incorpore en général une prime de risque ($\sigma^{\Qmeas} > \sigma^{\Prob}$), un tel backtest tendra à conclure à une \textbf{sur-estimation} de la PFE (trop d'exceptions \og manquantes \fg{}). Nous reviendrons sur ce point comme premier régime de mauvaise calibration de Hull--White.
+\end{remarque}
+
+\noindent Dans tout ce qui suit, sauf mention contraire, \textbf{l'exposition à backtester est calculée sous $\Prob$}.
+
+% ==================================================================
+\section{Le moteur d'exposition et le modèle de Hull--White}
+\label{sec:moteur}
+
+\subsection{Architecture générale}
+
+Un moteur d'exposition Monte-Carlo procède en trois étapes.
+\begin{enumerate}[nosep]
+  \item \textbf{Diffusion.} On simule $N$ trajectoires des facteurs de risque (ici le taux court $r$) sur une grille temporelle $0 = t_0 < t_1 < \dots < t_M = T$.
+  \item \textbf{Valorisation.} Pour chaque trajectoire $j$ et chaque date $t_k$, on revalorise chaque transaction : $V_i^{(j)}(t_k)$.
+  \item \textbf{Agrégation.} On agrège par \emph{netting set}, $V^{(j)}(t_k) = \sum_i V_i^{(j)}(t_k)$, on applique le collatéral éventuel, on calcule l'exposition $E^{(j)}(t_k) = (V^{(j)}(t_k) - C^{(j)}(t_k))^{+}$, puis les profils :
+  \begin{equation}
+  \widehat{\EE}(t_k) = \frac{1}{N}\sum_{j=1}^N E^{(j)}(t_k), \qquad
+  \widehat{\PFE}_\alpha(t_k) = \widehat{Q}_\alpha\big(\{E^{(j)}(t_k)\}_{j=1}^N\big),
+  \end{equation}
+  le quantile empirique étant l'estimateur usuel d'ordre $\lceil \alpha N\rceil$.
+\end{enumerate}
+
+\subsection{Le modèle de Hull--White à un facteur}
+
+Le modèle de Hull--White (1990), ou Vasicek étendu, décrit le \textbf{taux court} $r(t)$ par une diffusion gaussienne à retour à la moyenne :
+\begin{equation}
+\boxed{\;\dd r(t) = \big[\theta(t) - a\, r(t)\big]\,\dd t + \sigma\, \dd W(t)\;}
+\end{equation}
+où $a > 0$ est la \textbf{vitesse de retour à la moyenne}, $\sigma > 0$ la \textbf{volatilité}, $W$ un mouvement brownien, et $\theta(t)$ une fonction déterministe choisie pour reproduire \emph{exactement} la courbe de taux initiale.
+
+\paragraph{Propriétés clés (démontrées en annexe~\ref{app:hw}).} Le taux court est gaussien : conditionnellement à $r(s)$,
+\begin{equation}
+r(t)\,\big|\,r(s) \;\sim\; \mathcal{N}\!\Big(\,\underbrace{r(s)e^{-a(t-s)} + \alpha(t) - \alpha(s)e^{-a(t-s)}}_{\text{moyenne}},\;\; \underbrace{\tfrac{\sigma^2}{2a}\big(1-e^{-2a(t-s)}\big)}_{\text{variance}}\Big),
+\end{equation}
+avec $\alpha(t) = f^{M}(0,t) + \frac{\sigma^2}{2a^2}(1-e^{-at})^2$ où $f^{M}(0,t)$ est le taux forward instantané initial. Les prix de zéro-coupon sont \textbf{affines} :
+\begin{equation}
+P(t,T) = A(t,T)\,e^{-B(t,T)\,r(t)}, \qquad B(t,T) = \frac{1 - e^{-a(T-t)}}{a},
+\end{equation}
+avec $A(t,T)$ calibré sur la courbe initiale (annexe~\ref{app:hw}). Toute la courbe à la date $t$ --- donc la valeur de tout instrument de taux linéaire --- est ainsi une \textbf{fonction déterministe du seul $r(t)$} :
+\begin{equation}
+V(t) = g\big(r(t),\, t\big).
+\end{equation}
+Ce caractère \og un facteur \fg{} est à la fois la force (analytique, rapide) et la faiblesse (section~\ref{sec:sources}) du modèle.
+
+\begin{remarque}
+\textbf{Point de calibration crucial.} La variance conditionnelle ci-dessus tend, quand $t-s\to\infty$, vers $\sigma^2/(2a)$ : la dispersion du taux court est \textbf{bornée}. C'est l'empreinte du retour à la moyenne, et la source principale des écarts de PFE à horizon long (section~\ref{sec:sources}).
+\end{remarque}
+
+\subsection{Valorisation d'un swap le long des trajectoires}
+
+Soit un swap payeur de taux fixe $K$ contre un taux flottant, de notionnel $N$, sur les dates de paiement $T_1 < \dots < T_m$ d'accruals $\tau_i$. En l'absence de \emph{basis}, la valeur à la date $t$ (pour la partie non encore fixée) s'écrit, en fonction des prix de zéro-coupon :
+\begin{equation}
+V_{\text{swap}}(t) = N\Big[\big(P(t, T_{\eta(t)-1}) - P(t, T_m)\big) - K \!\!\sum_{i:\,T_i > t}\!\! \tau_i\, P(t, T_i)\Big],
+\end{equation}
+où $\eta(t)$ est l'indice de la prochaine date de paiement. Le premier terme valorise la jambe flottante, le second la jambe fixe. Comme chaque $P(t,T_i) = g_i(r(t),t)$, on a $V_{\text{swap}}(t) = g(r(t),t)$ : la revalorisation est analytique et instantanée sur chaque scénario. C'est ce qui rend le cas swap idéal pour un premier backtest.
+
+\subsection{Construction des profils EE et PFE}
+
+On obtient $\widehat{\EE}(t_k)$ et $\widehat{\PFE}_\alpha(t_k)$ par les estimateurs de la section~3.1. Pour un swap payeur, le profil de PFE croît d'abord (la diffusion du taux écarte les valeurs), atteint un pic, puis décroît vers l'échéance (l'effet d'amortissement, \emph{roll-off}, l'emporte). C'est ce profil que nous devons valider.
+
+\subsection{Sources de mauvaise calibration de Hull--White}
+\label{sec:sources}
+
+Avant de backtester, il est utile d'anticiper \emph{où} le modèle peut faillir. Cinq sources structurelles.
+\begin{enumerate}[nosep]
+  \item \textbf{Retour à la moyenne et horizon long.} La variance bornée $\sigma^2/(2a)$ implique que la dispersion de la PFE plafonne. Si la dynamique réelle des taux est plus proche d'une marche aléatoire (variance $\sim \sigma^2 t$, non bornée), Hull--White \textbf{sous-estime la PFE aux horizons longs}.
+  \item \textbf{Mono-factorialité et trades de courbe.} Avec un seul facteur, \emph{tous} les points de la courbe sont parfaitement corrélés : ils ne peuvent que monter ou descendre ensemble. Un portefeuille pariant sur la \textbf{déformation} de la courbe (\emph{steepener} : payeur sur le long, receveur sur le court) voit, dans le monde réel, sa valeur dispersée par les mouvements relatifs court/long que le modèle ne peut produire. Hull--White \textbf{sous-estime alors fortement la PFE} de tels \emph{netting sets}.
+  \item \textbf{Gaussianité.} Les queues gaussiennes sous-pondèrent les chocs extrêmes (sauts, crises). Le quantile à $99\,\%$ peut être sous-estimé en présence de leptokurtose réelle.
+  \item \textbf{Volatilité constante.} Une $\sigma$ constante ignore la structure par terme et la dépendance au niveau (volatilité plus forte quand les taux sont élevés, ou \emph{normal/lognormal mixing}).
+  \item \textbf{Mésusage de mesure.} Calibrer $\sigma$ sur les swaptions ($\Qmeas$) puis backtester contre l'histoire ($\Prob$) tend à \textbf{sur-estimer la PFE} (section~\ref{sec:mesures}).
+\end{enumerate}
+Notre étude empirique (section~\ref{sec:empirique}) instrumente précisément les régimes 1, 2 et 5, qui donnent des prédictions de signe opposé et donc des résultats discriminants.
+
+% ==================================================================
+\section{Le problème : valider un quantile prospectif a posteriori}
+\label{sec:probleme}
+
+\subsection{Rappel : backtesting de la VaR}
+
+La VaR à un jour et au seuil $\alpha$ est le quantile de niveau $1-\alpha$ de la perte de portefeuille sur un jour. Chaque jour fournit \textbf{une} réalisation de P\&L, comparée à la VaR prédite la veille. On définit l'indicatrice d'\textbf{exception} (\emph{breach})
+\begin{equation}
+I_t = \Indic\{\text{perte}_t > \mathrm{VaR}_t\}.
+\end{equation}
+Si le modèle est correct, $\Prob(I_t = 1) = 1-\alpha$ et les $I_t$ sont \textbf{indépendantes}. Sur $T$ jours, $\{I_t\}$ est une suite de Bernoulli i.i.d. dont on teste la moyenne (Kupiec) et l'indépendance (Christoffersen). C'est simple car le quantile est ré-émis et résolu chaque jour.
+
+\subsection{Pourquoi la PFE est différente}
+
+Trois différences fondamentales.
+\begin{enumerate}[nosep]
+  \item \textbf{Horizon long, et non un jour.} $\PFE_\alpha(t)$ projette à des horizons $t$ pouvant atteindre des années. On ne peut pas attendre des années pour une réalisation, puis recommencer.
+  \item \textbf{Une seule trajectoire réalisée par trade.} Pour un swap donné, il n'existe qu'une histoire de marché. On ne peut donc estimer un quantile \og transversal \fg{} d'exposition par répétition du même trade. Il faut \textbf{rouler le test dans le temps} : utiliser de nombreuses dates de départ $t_i$ et un horizon \textbf{relatif} $h$, et confronter l'exposition réalisée à $t_i + h$ à la PFE prédite en $t_i$ pour l'horizon $h$.
+  \item \textbf{Mesure $\Prob$ obligatoire} (section~\ref{sec:mesures}).
+\end{enumerate}
+
+\subsection{La transformée probabiliste (PIT) comme socle}
+\label{sec:pit}
+
+L'outil unificateur est la \textbf{transformée probabiliste} (\emph{Probability Integral Transform}, Rosenblatt 1952). Si une variable réelle $X$ admet la fonction de répartition continue $F$, alors $U = F(X) \sim \mathcal{U}(0,1)$. Appliquée aux prévisions de densité : si le modèle prédit, pour l'observation $i$, la fonction de répartition $\hat F_i$, et si le modèle est \textbf{correct}, alors les
+\begin{equation}
+u_i = \hat F_i(x_i^{\text{réalisé}})
+\end{equation}
+sont \textbf{i.i.d. uniformes sur $[0,1]$}. Tout le backtesting de distribution se ramène à tester cette double propriété (uniformité $+$ indépendance). Les tests de couverture (Kupiec, Christoffersen) n'en examinent qu'\textbf{un seuil} (la queue au-delà du quantile), tandis que Berkowitz examine \textbf{toute la densité}. Nous combinerons les deux niveaux de granularité.
+
+\begin{remarque}
+\textbf{Avertissement (subtilité de l'exposition).} $E(t) = V(t)^{+}$ possède un \textbf{atome en zéro} : $\Prob(E(t)=0) = \Prob(V(t)\le 0) > 0$. Sa fonction de répartition n'est donc \textbf{pas continue} en $0$, et la PIT appliquée \emph{directement à l'exposition} ne produit \textbf{pas} des uniformes (les réalisations hors-la-monnaie s'empilent). C'est un argument décisif pour backtester au \textbf{niveau des facteurs de risque} (dont la loi est continue) et déduire les profils d'exposition, plutôt que de backtester l'exposition brute. Nous développons les deux approches en section~\ref{sec:niveau} et recommandons la première.
+\end{remarque}
+
+% ==================================================================
+\section{Cadre de backtesting des quantiles de PFE}
+\label{sec:cadre}
+
+On fixe un \textbf{horizon relatif} $h$ (ex.\ 1~mois, 1~an) et un \textbf{niveau} $\alpha$ (ex.\ $0{,}975$). On dispose d'une série historique des facteurs de risque sur $[0, \mathcal{T}]$ et d'un ensemble de \textbf{dates de départ} $\{t_1, \dots, t_T\}$ espacées de $\Delta$.
+
+\subsection{Définition de l'exception d'exposition}
+
+À chaque date de départ $t_i$, le moteur prédit la distribution de l'exposition à l'horizon $t_i + h$ et en extrait $\PFE_\alpha(t_i, h)$. Après écoulement du temps, on observe l'exposition réalisée $E(t_i + h)$. On définit l'\textbf{exception d'exposition}
+\begin{equation}
+\boxed{\;I_i = \Indic\big\{\, E(t_i + h) > \PFE_\alpha(t_i, h)\,\big\}.\;}
+\end{equation}
+Sous calibration correcte (et hors atome, cf.\ \emph{infra}), $\Prob(I_i = 1) = 1-\alpha =: p$. Le backtesting des quantiles de PFE consiste à tester que la suite $\{I_i\}$ se comporte comme des Bernoulli$(p)$ indépendantes.
+
+\begin{remarque}
+\textbf{Note sur l'atome.} Si $\alpha$ dépasse $\Prob(E=0)$ --- toujours le cas pour les quantiles élevés d'intérêt --- alors $\PFE_\alpha > 0$ et la définition ci-dessus est bien posée : l'exception est un dépassement \textbf{strictement dans la partie continue} de la distribution, et le décompte d'exceptions reste valide. C'est précisément pourquoi le test de \textbf{couverture} (un seul seuil élevé) survit à l'atome, alors que le test de \textbf{densité} directement sur $E$ n'y survit pas. Nous exploitons cette dissymétrie.
+\end{remarque}
+
+\subsection{Test de Kupiec : couverture inconditionnelle (POF)}
+
+Le test de proportion d'échecs de Kupiec (1995) vérifie que la \textbf{fréquence} d'exceptions correspond à $p$. Soit $x = \sum_{i=1}^{T} I_i$ le nombre d'exceptions et $\hat\pi = x/T$. La statistique du rapport de vraisemblance est
+\begin{equation}
+\boxed{\;\LRuc = -2\ln\!\frac{p^{x}(1-p)^{T-x}}{\hat\pi^{\,x}(1-\hat\pi)^{T-x}}
+= -2\Big[x\ln\tfrac{p}{\hat\pi} + (T-x)\ln\tfrac{1-p}{1-\hat\pi}\Big] \;\xrightarrow{d}\; \chi^2_1.\;}
+\end{equation}
+On rejette la calibration au seuil $\beta$ (ex.\ $5\,\%$) si $\LRuc > \chi^2_{1,1-\beta}$. \textbf{Limite :} $\LRuc$ ne détecte qu'un biais de niveau, pas le regroupement temporel des exceptions.
+
+\subsection{Test de Christoffersen : indépendance et couverture conditionnelle}
+
+Christoffersen (1998) ajoute la \textbf{dynamique}. On modélise $\{I_i\}$ comme une chaîne de Markov d'ordre~1 sur $\{0,1\}$ et l'on compte les transitions $n_{ab}$ (de l'état $a$ à l'état $b$). Avec
+\begin{equation}
+\pi_{01} = \frac{n_{01}}{n_{00}+n_{01}}, \quad \pi_{11} = \frac{n_{11}}{n_{10}+n_{11}}, \quad \pi = \frac{n_{01}+n_{11}}{n_{00}+n_{01}+n_{10}+n_{11}},
+\end{equation}
+le test d'\textbf{indépendance} (sous $H_0$ : $\pi_{01} = \pi_{11}$, i.e.\ l'exception ne dépend pas de l'état précédent) est
+\begin{equation}
+\LRind = -2\ln\!\frac{(1-\pi)^{n_{00}+n_{10}}\,\pi^{\,n_{01}+n_{11}}}{(1-\pi_{01})^{n_{00}}\pi_{01}^{\,n_{01}}(1-\pi_{11})^{n_{10}}\pi_{11}^{\,n_{11}}} \;\xrightarrow{d}\; \chi^2_1.
+\end{equation}
+Le test de \textbf{couverture conditionnelle} combine niveau et indépendance :
+\begin{equation}
+\boxed{\;\LRcc = \LRuc + \LRind \;\xrightarrow{d}\; \chi^2_2.\;}
+\end{equation}
+L'indépendance est \textbf{particulièrement importante pour la PFE} : un défaut de calibration des dynamiques (mauvais retour à la moyenne) se manifeste typiquement par des exceptions \textbf{groupées} dans certains régimes de marché, que $\LRind$ détecte là où $\LRuc$ resterait aveugle.
+
+\subsection{Test de Berkowitz : densité complète (queue supérieure)}
+
+Pour exploiter toute l'information de la distribution prédite --- et non le seul seuil $\alpha$ --- on recourt à Berkowitz (2001). À partir des PIT $u_i$ (au niveau facteur de risque, cf.\ \ref{sec:niveau}), on forme $z_i = \Phi^{-1}(u_i)$. Sous calibration correcte, $z_i \sim$ i.i.d.\ $\mathcal{N}(0,1)$. On ajuste un AR(1)
+\begin{equation}
+z_i - \mu = \rho\,(z_{i-1} - \mu) + \varepsilon_i, \quad \varepsilon_i \sim \mathcal{N}(0, \sigma_\varepsilon^2),
+\end{equation}
+et l'on teste $H_0: \mu = 0,\ \sigma_\varepsilon^2 = 1,\ \rho = 0$ par rapport de vraisemblance, $\LRB \xrightarrow{d} \chi^2_3$. La PFE concernant la \textbf{queue supérieure} de l'exposition, on privilégie la variante \textbf{censurée} de Berkowitz, qui ne teste la densité qu'au-delà du seuil $\alpha$ (on censure $z_i$ en deçà du quantile et on teste la loi de la partie excédentaire). C'est le test le plus puissant pour notre objet, et il est complémentaire des tests de couverture (plus interprétables pour le superviseur).
+
+\subsection{Le problème des fenêtres temporelles chevauchantes}
+\label{sec:overlap}
+
+C'est l'écueil méthodologique central, souvent négligé. Si l'espacement des dates de départ $\Delta$ est \textbf{inférieur} à l'horizon $h$, les fenêtres $[t_i, t_i + h]$ se \textbf{recouvrent}. Deux exceptions consécutives partagent alors une grande partie de leur trajectoire de marché : la suite $\{I_i\}$ acquiert une \textbf{autocorrélation mécanique}, même sous un modèle parfaitement calibré.
+
+Conséquences : (i) $\LRind$ \textbf{rejette à tort} l'indépendance (fausse alerte de regroupement) ; (ii) la variance effective de $\hat\pi$ est sous-estimée, ce qui \textbf{distord la taille} du test de Kupiec. Trois remèdes :
+\begin{enumerate}[nosep]
+  \item \textbf{Fenêtres non chevauchantes} ($\Delta \ge h$) : la suite $\{I_i\}$ redevient quasi-i.i.d.\ et les tests s'appliquent tels quels. Coût : forte réduction de la taille d'échantillon (un seul test indépendant tous les $h$).
+  \item \textbf{Correction de variance / bootstrap par blocs} : conserver le chevauchement mais corriger l'inférence (variance HAC type Newey--West, ou \emph{block bootstrap} de longueur $\ge h/\Delta$) pour Kupiec ; renoncer à $\LRind$ \og brut \fg{}.
+  \item \textbf{Approche multi-horizons d'Anfuso--Karyampas--Nawroth (2017)} : tester la distribution prédite à chaque horizon via la PIT au niveau facteur de risque, et agréger sur la courbe des horizons en tenant compte explicitement de la structure de corrélation induite (décomposition niveau/tendance). Cette approche, conçue pour la conformité Bâle~III, est la référence pour un cadre industriel.
+\end{enumerate}
+Nous adoptons une \textbf{stratégie en couches} : fenêtres non chevauchantes pour les tests de couverture interprétables (Kupiec/Christoffersen) ; PIT au niveau facteur de risque $+$ Berkowitz censuré, agrégés à la Anfuso et al., pour la puissance.
+
+\subsection{Backtesting au niveau facteur de risque versus au niveau exposition}
+\label{sec:niveau}
+
+Deux philosophies coexistent.
+\begin{itemize}[nosep]
+  \item \textbf{Niveau exposition} (direct) : on backteste $E(t)$. Avantage : on teste exactement la grandeur d'intérêt. Inconvénients : l'atome en zéro brise la PIT de densité (section~\ref{sec:pit}), et chaque trade ne fournit qu'une trajectoire.
+  \item \textbf{Niveau facteur de risque} (recommandé) : on backteste la distribution simulée du \textbf{taux} (ou des facteurs) à chaque horizon. La loi du facteur étant \textbf{continue}, la PIT produit de vraies uniformes ; la densité est testable (Berkowitz). Comme l'exposition est une \textbf{fonction déterministe} des facteurs ($E(t)=h(r(t),t)$ via le pricer), une calibration correcte des facteurs \textbf{à tous les horizons} garantit la correction des profils EE/PFE.
+\end{itemize}
+
+\begin{remarque}
+\textbf{Principe directeur.} Backtester les facteurs de risque, puis valider que le mapping facteur$\to$exposition (le pricer) est exact, sépare proprement deux sources d'erreur (le \textbf{modèle de diffusion} vs le \textbf{modèle de valorisation}) et contourne l'atome. Le décompte d'exceptions de PFE (sections~5.1--5.3) demeure néanmoins indispensable comme métrique superviseur, directement interprétable, robuste à l'atome au seuil élevé.
+\end{remarque}
+
+\subsection{Protocole multi-horizons et agrégation}
+
+On répète l'ensemble pour une grille d'horizons relatifs $h \in \{h_1, \dots, h_p\}$ (ex.\ 1S, 1M, 3M, 1A, 2A) et de niveaux $\alpha \in \{0{,}95;\,0{,}975;\,0{,}99\}$. On obtient une \textbf{matrice de p-values} (horizon $\times$ niveau) pour chacun des tests. L'agrégation sur les horizons exige de tenir compte de leur corrélation (les horizons proches partagent de l'information) : on applique une correction de multiplicité (Bonferroni--Holm comme borne conservatrice) ou la métrique de discordance agrégée d'Anfuso et al. Le verdict de validation se lit alors comme un \textbf{tableau de bord} plutôt que comme un test unique.
+
+% ==================================================================
+\section{Conception de l'étude empirique}
+\label{sec:empirique}
+
+\subsection{Le processus générateur \og vrai \fg{} (DGP) versus le modèle}
+
+Pour démontrer que le cadre \textbf{détecte} une mauvaise calibration, on procède par \textbf{simulation contrôlée} : on choisit un processus générateur de données (DGP) \og vrai \fg{} sous $\Prob$, on en simule de longues histoires de marché (les \og réalisations \fg{}), puis on backteste un moteur d'exposition \textbf{Hull--White} dont la calibration s'écarte du DGP de façon connue. On peut ainsi valider la \textbf{puissance} du test (rejette-t-il quand il faut ?) et sa \textbf{taille} (sous DGP $=$ modèle, le taux de rejet doit avoisiner $\beta$). On complète par des \textbf{courbes publiques} (courbe de taux d'une date donnée, ex.\ courbes OIS/EUR publiées par une banque centrale) pour ancrer la courbe initiale du modèle et donner un caractère réaliste aux niveaux.
+
+Quatre DGP \og vrais \fg{} sont retenus, par sévérité croissante :
+\begin{itemize}[nosep]
+  \item \textbf{DGP-A (cohérent)} : Hull--White avec $(a^\star, \sigma^\star)$. Sert de \textbf{contrôle négatif} : le test ne doit pas rejeter (vérification de la taille).
+  \item \textbf{DGP-B (persistance excessive)} : Hull--White avec un retour à la moyenne \textbf{plus faible} que celui du modèle ($a_{\text{vrai}} < a_{\text{modèle}}$), voire une marche aléatoire. Doit révéler la \textbf{sous-estimation} de la PFE à horizon long (régime~\ref{sec:sources}.1).
+  \item \textbf{DGP-C (multi-facteurs / déformation de courbe)} : modèle à deux facteurs (G2++) générant des mouvements relatifs court/long. Confronté à un Hull--White mono-facteur, doit révéler la \textbf{sous-estimation} de la PFE des trades de courbe (régime~\ref{sec:sources}.2).
+  \item \textbf{DGP-D (mésusage de mesure)} : DGP-A, mais moteur calibré avec $\sigma^{\Qmeas} > \sigma^\star$. Doit révéler la \textbf{sur-estimation} de la PFE (régime~\ref{sec:sources}.5), soit un \textbf{déficit} d'exceptions.
+\end{itemize}
+
+\subsection{Cas 1 : un swap de taux vanille}
+
+Swap payeur EUR, notionnel 10~M\euro, maturité 5~ans, fixe annuel contre flottant semestriel, courbe initiale issue d'une courbe publique. On calcule le profil $\PFE_\alpha(t)$ par le moteur, puis on déroule le backtesting des sections~5.1--5.4 sur une grille d'horizons et de niveaux. Prédictions :
+\begin{itemize}[nosep]
+  \item sous \textbf{DGP-A} : tous les tests passent (taux d'exception $\approx 1-\alpha$) ;
+  \item sous \textbf{DGP-B} : excès d'exceptions aux \textbf{horizons longs} ($\LRuc$ et $\LRcc$ rejettent pour $h\ge 1\text{A}$), regroupées (rejet de $\LRind$) ;
+  \item sous \textbf{DGP-D} : \textbf{déficit} d'exceptions à tous horizons (le moteur est trop conservateur) ; $\LRuc$ rejette \og par le bas \fg{}.
+\end{itemize}
+
+\subsection{Cas 2 : un portefeuille (\emph{netting set}) exposé à la courbe}
+\label{sec:portefeuille}
+
+\emph{Netting set} construit comme un \textbf{steepener} : payeur d'un swap 10A et receveur d'un swap 2A, notionnels ajustés pour une sensibilité directionnelle de premier ordre quasi nulle mais une forte sensibilité à la \textbf{pente}. Le netting (section~2.3) réduit l'exposition directionnelle ; l'exposition résiduelle provient essentiellement de la \textbf{déformation de courbe}.
+\begin{itemize}[nosep]
+  \item Sous un Hull--White mono-facteur, la pente est (quasi) déterministe : la PFE du portefeuille est \textbf{fortement sous-estimée}.
+  \item Sous \textbf{DGP-C}, l'histoire réalisée présente une vraie volatilité de pente : excès massif d'exceptions $\Rightarrow$ rejet net de Kupiec/Christoffersen. C'est le résultat le plus spectaculaire et le plus pédagogique : il \textbf{isole} la limite mono-factorielle.
+\end{itemize}
+
+\subsection{Scénarios de mauvaise calibration testés (synthèse)}
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\linewidth}{@{}l l l X l@{}}
+\toprule
+\textbf{Scénario} & \textbf{DGP \og vrai \fg} & \textbf{Calibration moteur} & \textbf{Effet attendu sur la PFE} & \textbf{Signature de backtest} \\
+\midrule
+A --- contrôle & HW $(a^\star,\sigma^\star)$ & HW $(a^\star,\sigma^\star)$ & correcte & aucun rejet (taille $\approx\beta$) \\
+B --- persistance & HW $a_{\text{vrai}}\!\ll\! a_{\text{mod}}$ & HW $a_{\text{mod}}$ & sous-estimée aux horizons longs & excès d'exceptions, regroupées, $h$ long \\
+C --- courbe & G2++ (2 facteurs) & HW (1 facteur) & sous-estimée (steepener) & excès d'exceptions massif (portefeuille) \\
+D --- mesure & HW $(a^\star,\sigma^\star)$ & HW $\sigma^{\Qmeas}>\sigma^\star$ & sur-estimée & déficit d'exceptions, tous horizons \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Métriques et critères de décision}
+
+Pour chaque (test, horizon, niveau) : taux d'exception observé $\hat\pi$, statistique et p-value. Critères : rejet si p-value $< \beta = 5\,\%$ (avec correction de multiplicité sur la grille). On rapporte également des indicateurs de magnitude : ratio $\widehat{\PFE}/\PFE_{\text{vrai}}$ par horizon (biais relatif), et la \og zone \fg{} de feux tricolores (vert/jaune/rouge) inspirée du cadre superviseur, transposée à l'exposition. La distinction \textbf{taille} (scénario~A) / \textbf{puissance} (B, C, D) structure la lecture.
+
+% ==================================================================
+\section{Résultats attendus et discussion}
+\label{sec:resultats}
+
+L'analyse de la section~\ref{sec:sources} fournit des prédictions de \textbf{signe}, que l'étude empirique doit confirmer.
+
+\paragraph{Sous-estimation à horizon long (DGP-B).} La variance bornée $\sigma^2/(2a)$ du taux court sous Hull--White plafonne la dispersion, alors qu'un DGP plus persistant la laisse croître. Le ratio $\widehat{\PFE}/\PFE_{\text{vrai}}$ doit décroître sous~1 quand $h$ augmente, avec excès d'exceptions corrélé aux horizons longs. C'est le cas le plus dangereux opérationnellement : un moteur trop \og mean-reverting \fg{} \textbf{rassure à tort} sur le risque à long terme.
+
+\paragraph{Sous-estimation des trades de courbe (DGP-C).} La mono-factorialité supprime la composante de risque de pente. Le portefeuille steepener, dont c'est \emph{la seule} source d'exposition résiduelle après netting, exhibe un effondrement de la PFE simulée et une explosion du taux d'exception. Ce résultat illustre que \textbf{le backtesting au niveau du netting set capture des défauts invisibles au niveau du trade isolé} --- un argument fort pour backtester les portefeuilles, pas seulement les transactions.
+
+\paragraph{Sur-estimation par mésusage de mesure (DGP-D).} Transposer une volatilité risque-neutre à un backtest historique gonfle la PFE et raréfie les exceptions. Le test de Kupiec rejette \og par le bas \fg{} ($\hat\pi \ll p$). Ce cas, fréquent en pratique quand un moteur unique sert CVA et risque, rappelle que \textbf{le backtesting impose la calibration $\Prob$}, et que confondre les mesures produit un conservatisme illusoire --- coûteux en capital et en limites.
+
+\paragraph{Lecture transversale.} Les tests de couverture (Kupiec/Christoffersen) offrent un verdict interprétable mais peu puissant (un seul seuil) ; le test de Berkowitz censuré sur la PIT au niveau facteur de risque détecte des défauts de forme plus fins. La cohérence des deux niveaux, sur la grille horizon $\times$ niveau, constitue le diagnostic robuste recherché par la validation.
+
+% ==================================================================
+\section{Limites et extensions}
+\label{sec:limites}
+
+\begin{enumerate}[nosep]
+  \item \textbf{Collatéral et délai de marge.} Le cas collatéralisé remplace $E(t)=V(t)^+$ par $(V(t)-C(t))^+$ avec délai ; l'exposition pertinente devient l'exposition sur la \emph{Margin Period of Risk}, ce qui modifie la définition de l'exception (section~5.1) mais non la mécanique des tests.
+  \item \textbf{Wrong-Way Risk.} Une dépendance entre l'exposition et la qualité de crédit de la contrepartie n'est pas testée ici ; elle exigerait un backtesting joint exposition/spread.
+  \item \textbf{Multi-facteurs et multi-actifs.} La PIT se généralise via la transformée de Rosenblatt conditionnelle ; l'agrégation de facteurs corrélés (taux, FX, crédit) appelle des tests multivariés.
+  \item \textbf{Taille d'échantillon.} Les horizons longs et les fenêtres non chevauchantes raréfient les observations indépendantes ; le \emph{block bootstrap} et l'agrégation à la Anfuso et al.\ atténuent, sans supprimer, cette contrainte fondamentale.
+  \item \textbf{Non-stationnarité.} Les régimes de marché (politique monétaire) violent l'hypothèse de loi inchangée ; un backtesting par sous-périodes est recommandé.
+\end{enumerate}
+
+% ==================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+Nous avons proposé un cadre auto-contenu de backtesting des quantiles de \emph{Potential Future Exposure}, en transposant les tests de couverture de la VaR (Kupiec, Christoffersen) et le test de densité de Berkowitz à l'objet \og exposition \fg{}, et en explicitant trois écueils spécifiques rarement formalisés dans la littérature ouverte : la nécessité de la mesure historique $\Prob$, l'autocorrélation mécanique des fenêtres chevauchantes, et l'atome en zéro de l'exposition qui impose un backtesting au niveau des facteurs de risque. L'analyse du modèle de Hull--White prédit, et l'étude empirique contrôlée doit confirmer, trois régimes de mauvaise calibration aux signatures distinctes : sous-estimation de la PFE à horizon long (retour à la moyenne excessif), sous-estimation des expositions de courbe (mono-factorialité), et sur-estimation par mésusage de la mesure risque-neutre. Le cadre est directement opérationnalisable : un volet d'implémentation Python, sur données simulées et courbes publiques, en constitue le prolongement naturel.
+
+% ==================================================================
+\appendix
+
+\section*{Références}
+\addcontentsline{toc}{section}{Références}
+\begin{description}[leftmargin=1.5em,style=nextline,nosep]
+  \item Anfuso, F., Karyampas, D., \& Nawroth, A. (2017). \emph{A Sound Basel~III Compliant Framework for Backtesting Credit Exposure Models.} SSRN Working Paper.
+  \item Berkowitz, J. (2001). Testing density forecasts, with applications to risk management. \emph{Journal of Business \& Economic Statistics}, 19(4), 465--474.
+  \item Basel Committee on Banking Supervision (2010, 2015). \emph{Sound practices for backtesting counterparty credit risk models}~; documents IMM.
+  \item Cesari, G., Aquilina, J., Charpillon, N., Filipovi\'c, Z., Lee, G., \& Manda, I. (2009). \emph{Modelling, Pricing, and Hedging Counterparty Credit Exposure.} Springer.
+  \item Christoffersen, P. (1998). Evaluating interval forecasts. \emph{International Economic Review}, 39(4), 841--862.
+  \item Diebold, F.~X., Gunther, T.~A., \& Tay, A.~S. (1998). Evaluating density forecasts. \emph{International Economic Review}, 39(4), 863--883.
+  \item Gregory, J. (2020). \emph{The xVA Challenge: Counterparty Risk, Funding, Collateral, Capital and Initial Margin} (4e éd.). Wiley.
+  \item Hull, J., \& White, A. (1990). Pricing interest-rate-derivative securities. \emph{Review of Financial Studies}, 3(4), 573--592.
+  \item Kenyon, C., \& Stamm, R. (2012). \emph{Discounting, LIBOR, CVA and Funding.} Palgrave Macmillan.
+  \item Kupiec, P. (1995). Techniques for verifying the accuracy of risk measurement models. \emph{Journal of Derivatives}, 3(2), 73--84.
+  \item Rosenblatt, M. (1952). Remarks on a multivariate transformation. \emph{Annals of Mathematical Statistics}, 23(3), 470--472.
+\end{description}
+
+\section{Notations}
+\label{app:notations}
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+\textbf{Symbole} & \textbf{Signification} \\
+\midrule
+$V(t)$ & valeur de marché (mark-to-market) du \emph{netting set} à $t$ \\
+$E(t) = (V(t)-C(t))^+$ & exposition à $t$ \\
+$\EE(t),\ \EPE$ & exposition espérée, exposition positive espérée \\
+$\PFE_\alpha(t)$ & quantile de niveau $\alpha$ de $E(t)$ \\
+$\Prob,\ \Qmeas$ & mesures historique et risque-neutre \\
+$r(t),\ a,\ \sigma$ & taux court, vitesse de retour à la moyenne, volatilité (Hull--White) \\
+$P(t,T)$ & prix en $t$ du zéro-coupon de maturité $T$ \\
+$h,\ \Delta$ & horizon relatif de backtest, espacement des dates de départ \\
+$I_i,\ p=1-\alpha$ & indicatrice d'exception, probabilité d'exception théorique \\
+$u_i,\ z_i=\Phi^{-1}(u_i)$ & PIT, PIT gaussianisé (Berkowitz) \\
+$\LRuc,\LRind,\LRcc,\LRB$ & statistiques de Kupiec, indépendance, couverture cond., Berkowitz \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Compléments sur Hull--White}
+\label{app:hw}
+
+\paragraph{Prix du zéro-coupon.} Sous le modèle de Hull--White à un facteur,
+\begin{equation}
+P(t,T) = A(t,T)\,e^{-B(t,T)\,r(t)}, \qquad B(t,T) = \frac{1-e^{-a(T-t)}}{a},
+\end{equation}
+\begin{equation}
+\ln A(t,T) = \ln\frac{P^{M}(0,T)}{P^{M}(0,t)} + B(t,T)\,f^{M}(0,t) - \frac{\sigma^2}{4a}\big(1-e^{-2at}\big)B(t,T)^2,
+\end{equation}
+où $P^{M}(0,\cdot)$ est la courbe d'actualisation de marché et $f^{M}(0,t)$ le taux forward instantané initial. Cette forme garantit l'ajustement exact à la courbe initiale.
+
+\paragraph{Loi du taux court.} Conditionnellement à $r(s)$, $r(t)$ est gaussien de moyenne $r(s)e^{-a(t-s)} + \alpha(t) - \alpha(s)e^{-a(t-s)}$ et de variance $\frac{\sigma^2}{2a}(1-e^{-2a(t-s)})$, avec $\alpha(t)=f^{M}(0,t)+\frac{\sigma^2}{2a^2}(1-e^{-at})^2$. La variance tend vers $\sigma^2/(2a)$, borne qui sous-tend la sous-estimation de la PFE à horizon long.
+
+\paragraph{Schéma de simulation exact.} Le taux étant gaussien, on simule sans biais de discrétisation :
+\begin{equation}
+r(t_{k+1}) = r(t_k)e^{-a\Delta_k} + M_k + \sqrt{\tfrac{\sigma^2}{2a}\big(1-e^{-2a\Delta_k}\big)}\;\xi_k, \quad \xi_k \sim \mathcal{N}(0,1)\ \text{i.i.d.},
+\end{equation}
+où $M_k = \alpha(t_{k+1}) - \alpha(t_k)e^{-a\Delta_k}$ et $\Delta_k = t_{k+1}-t_k$. C'est ce schéma qu'utilisera le moteur Python.
+
+\end{document}
